@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --main: #ff6b6b;
+  --overlay: rgba(0, 0, 0, 0.8);
+  --bg: #fcd7d7;
+  --text: #000;
+  --border: #000;
+}
+
+@layer components {
+  .neo-brutalist-card {
+    @apply rounded-xl border-4 border-black bg-[#ff6b6b] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden;
+  }
+}
