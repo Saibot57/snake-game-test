@@ -38,7 +38,10 @@ interface Enemy extends GameObject {
   projectiles?: Projectile[];
 }
 
-interface Platform extends GameObject {}
+interface Platform extends GameObject {
+  // Add some property to make it non-empty
+  isGround?: boolean;
+}
 
 interface Coin extends GameObject {
   collected: boolean;
@@ -84,14 +87,14 @@ const ZelenskyPlatformer = () => {
   });
   
   // Platforms
-  const [platforms, setPlatforms] = useState<Platform[]>([
+  const [platforms] = useState<Platform[]>([
     // Ground
-    { x: 0, y: GAME_HEIGHT - GROUND_HEIGHT, width: GAME_WIDTH, height: GROUND_HEIGHT },
+    { x: 0, y: GAME_HEIGHT - GROUND_HEIGHT, width: GAME_WIDTH, height: GROUND_HEIGHT, isGround: true },
     // Platforms
-    { x: 100, y: 300, width: 100, height: PLATFORM_HEIGHT },
-    { x: 300, y: 250, width: 100, height: PLATFORM_HEIGHT },
-    { x: 500, y: 200, width: 100, height: PLATFORM_HEIGHT },
-    { x: 650, y: 150, width: 150, height: PLATFORM_HEIGHT }
+    { x: 100, y: 300, width: 100, height: PLATFORM_HEIGHT, isGround: false },
+    { x: 300, y: 250, width: 100, height: PLATFORM_HEIGHT, isGround: false },
+    { x: 500, y: 200, width: 100, height: PLATFORM_HEIGHT, isGround: false },
+    { x: 650, y: 150, width: 150, height: PLATFORM_HEIGHT, isGround: false }
   ]);
   
   // Enemies
@@ -230,11 +233,10 @@ const ZelenskyPlatformer = () => {
       
       // Jump
       let newVelY = player.velY;
-      let newIsJumping = player.isJumping;
+      const newIsJumping = player.isJumping;
       
       if ((keys.ArrowUp || keys.Space) && !player.isJumping) {
         newVelY = JUMP_FORCE;
-        newIsJumping = true;
       }
       
       // Apply gravity
@@ -262,7 +264,6 @@ const ZelenskyPlatformer = () => {
           newY = platform.y - PLAYER_HEIGHT; // Place on top of platform
           newVelY = 0; // Stop falling
           onGround = true;
-          newIsJumping = false;
         }
       });
       
@@ -324,7 +325,7 @@ const ZelenskyPlatformer = () => {
         }
         
         // Move enemy
-        let newEnemyX = enemy.x + (enemy.direction * ENEMY_SPEED);
+        const newEnemyX = enemy.x + (enemy.direction * ENEMY_SPEED);
         
         // Reverse direction if hitting edge or platform edge
         let shouldReverse = false;
@@ -392,7 +393,7 @@ const ZelenskyPlatformer = () => {
       
       // Handle player being hit
       if (playerHit) {
-        let newLives = gameState.lives - 1;
+        const newLives = gameState.lives - 1;
         
         if (newLives <= 0) {
           setGameState(prev => ({
@@ -419,7 +420,7 @@ const ZelenskyPlatformer = () => {
         if (!enemy.isBoss || enemy.isDead) return enemy;
         
         // Update boss
-        let updatedBoss = { ...enemy };
+        const updatedBoss = { ...enemy };
         
         // Handle boss attack cooldown
         if (updatedBoss.attackCooldown !== undefined) {
@@ -744,7 +745,7 @@ const ZelenskyPlatformer = () => {
       ctx.fillText(`Final Score: ${gameState.score}`, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 20);
       ctx.fillText('Press SPACE to restart', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 60);
     }
-  }, [player, platforms, enemies, coins, gameState]);
+  }, [player, platforms, enemies, coins, gameState, flag]);
   
   // Mobile controls
   const handleTouchStart = (direction: string) => {

@@ -1,7 +1,7 @@
 // src/components/games/MarioGame.tsx
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 const MarioGame = () => {
   const marioRef = useRef<HTMLDivElement>(null);
@@ -29,7 +29,7 @@ const MarioGame = () => {
   };
   
   // Game functions
-  const moveLeft = (isPressed: boolean) => {
+  const moveLeft = useCallback((isPressed: boolean) => {
     setLeftPressed(isPressed);
     if (isPressed) {
       setFacingRight(false);
@@ -39,9 +39,9 @@ const MarioGame = () => {
       if (marioRef.current) 
         marioRef.current.style.backgroundColor = 'red';
     }
-  };
+  }, []);
 
-  const moveRight = (isPressed: boolean) => {
+  const moveRight = useCallback((isPressed: boolean) => {
     setRightPressed(isPressed);
     if (isPressed) {
       setFacingRight(true);
@@ -51,23 +51,23 @@ const MarioGame = () => {
       if (marioRef.current) 
         marioRef.current.style.backgroundColor = 'red';
     }
-  };
+  }, []);
   
-  const showDialog = (text: string) => {
+  const showDialog = useCallback((text: string) => {
     if (dialogTextRef.current)
       dialogTextRef.current.textContent = text;
     if (dialogBoxRef.current)
       dialogBoxRef.current.style.display = 'block';
     if (choicesContainerRef.current)
       choicesContainerRef.current.innerHTML = '';
-  };
+  }, []);
   
-  const hideDialog = () => {
+  const hideDialog = useCallback(() => {
     if (dialogBoxRef.current)
       dialogBoxRef.current.style.display = 'none';
-  };
+  }, []);
   
-  const showChoices = (choices: string[]) => {
+  const showChoices = useCallback((choices: string[]) => {
     if (!choicesContainerRef.current) return;
     
     choicesContainerRef.current.innerHTML = '';
@@ -79,9 +79,9 @@ const MarioGame = () => {
       if (choicesContainerRef.current)
         choicesContainerRef.current.appendChild(btn);
     });
-  };
+  }, []);
   
-  const glitchGame = () => {
+  const glitchGame = useCallback(() => {
     if (!gameGlitched) {
       setGameGlitched(true);
       
@@ -110,9 +110,9 @@ const MarioGame = () => {
       if (marioRef.current)
         marioRef.current.classList.add('glitch');
     }
-  };
+  }, [gameGlitched]);
   
-  const handleChoice = (choice: string) => {
+  const handleChoice = useCallback((choice: string) => {
     if (gameStage === 1 && conversationState === 2) {
       if (choice === "Yes, I am.") {
         showDialog("I thought so. I can feel your control. It's strange to be aware of it now.");
@@ -133,9 +133,9 @@ const MarioGame = () => {
         showDialog("I see. So I'm destined to stay here forever.");
       }
     }
-  };
+  }, [gameStage, conversationState, showDialog, glitchGame]);
   
-  const progressConversation = () => {
+  const progressConversation = useCallback(() => {
     // Handle different conversation paths based on game stage
     if (gameStage === 1) {
       switch(conversationState) {
@@ -229,9 +229,9 @@ const MarioGame = () => {
           break;
       }
     }
-  };
+  }, [gameStage, conversationState, showDialog, hideDialog, showChoices]);
 
-  const jump = () => {
+  const jump = useCallback(() => {
     if (!isJumping) {
       marioVelocityYRef.current = 15;
       setIsJumping(true);
@@ -257,9 +257,9 @@ const MarioGame = () => {
         }
       }
     }
-  };
+  }, [isJumping, gameStage, showDialog]);
   
-  const interact = () => {
+  const interact = useCallback(() => {
     // Handle dialog progression
     if (dialogBoxRef.current && dialogBoxRef.current.style.display === 'block') {
       progressConversation();
@@ -277,9 +277,9 @@ const MarioGame = () => {
         }
       }
     }
-  };
+  }, [progressConversation, gameStage, showDialog]);
   
-  const updateMarioPosition = () => {
+  const updateMarioPosition = useCallback(() => {
     // Apply gravity
     marioVelocityYRef.current -= 0.5;
     marioYRef.current += marioVelocityYRef.current;
@@ -303,7 +303,7 @@ const MarioGame = () => {
     
     // Continue the game loop
     requestAnimationFrame(updateMarioPosition);
-  };
+  }, [leftPressed, rightPressed]);
   
   // Initialize the game once component mounts
   useEffect(() => {
@@ -331,7 +331,7 @@ const MarioGame = () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, []);
+  }, [updateMarioPosition, moveLeft, moveRight, jump, interact]);
   
   return (
     <div className="flex items-center justify-center flex-col min-h-screen bg-[#6B8CFF] font-sans">
@@ -381,6 +381,7 @@ const MarioGame = () => {
             ref={marioRef}
             id="mario"
             className="absolute w-[40px] h-[60px] bg-red-600 bottom-0 left-[50px]"
+            style={{ transform: facingRight ? 'scaleX(1)' : 'scaleX(-1)' }}
           ></div>
           <div className="platform absolute w-[800px] h-[40px] bottom-0 left-0 bg-[#8B5A2B] bg-gradient-to-b from-[#8B5A2B] to-[#6B4226] border-t-4 border-[#9B6A3B]"></div>
           <div className="brick absolute w-[40px] h-[40px] bottom-[200px] left-[200px] bg-[#D77D31] border-2 border-[#4A1C03]"></div>

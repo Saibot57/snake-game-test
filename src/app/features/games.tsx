@@ -33,7 +33,7 @@ export default function GamesPage() {
           <div className="neo-brutalist-card p-6 h-64 w-64 flex flex-col items-center justify-center transition-transform hover:translate-y-[-5px]">
             <Joystick className="h-20 w-20 mb-4 text-white" />
             <h2 className="text-2xl font-monument text-white text-center">Self-Aware Mario</h2>
-            <p className="text-white text-center mt-2">Play as a Mario who realizes he's in a game</p>
+            <p className="text-white text-center mt-2">Play as a Mario who realizes he&apos;s in a game</p>
           </div>
         </Link>
       </div>

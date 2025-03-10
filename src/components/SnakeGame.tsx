@@ -106,7 +106,7 @@ const SnakeGame = () => {
   }, [snake]);
 
   // Start the game
-  const startGame = () => {
+  const startGame = useCallback(() => {
     setGameStarted(true);
     setGameOver(false);
     setSnake([{ x: 10, y: 10 }]);
@@ -116,7 +116,7 @@ const SnakeGame = () => {
     setFood(generateFood());
     setCurrentThought("");
     setShowThought(false);
-  };
+  }, [generateFood]);
 
   // Handle keystroke for direction change
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement> | KeyboardEvent) => {
