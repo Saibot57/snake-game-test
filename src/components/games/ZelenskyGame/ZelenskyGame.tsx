@@ -126,8 +126,8 @@ const ZelenskyPlatformer = () => {
     { x: 700, y: 80, width: COIN_SIZE, height: COIN_SIZE, collected: false }
   ]);
   
-  // Flag for game victory
-  const flag = { x: 750, y: 100, width: 30, height: 50 };
+  // Flag for game victory - wrapped in useMemo to prevent recreation on every render
+  const flag = React.useMemo(() => ({ x: 750, y: 100, width: 30, height: 50 }), []);
   
   // Handle keyboard input
   useEffect(() => {
@@ -233,7 +233,6 @@ const ZelenskyPlatformer = () => {
       
       // Jump
       let newVelY = player.velY;
-      const newIsJumping = player.isJumping;
       
       if ((keys.ArrowUp || keys.Space) && !player.isJumping) {
         newVelY = JUMP_FORCE;
