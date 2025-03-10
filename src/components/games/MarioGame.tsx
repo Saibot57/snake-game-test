@@ -67,20 +67,6 @@ const MarioGame = () => {
       dialogBoxRef.current.style.display = 'none';
   }, []);
   
-  const showChoices = useCallback((choices: string[]) => {
-    if (!choicesContainerRef.current) return;
-    
-    choicesContainerRef.current.innerHTML = '';
-    choices.forEach(choice => {
-      const btn = document.createElement('button');
-      btn.className = 'choice-btn';
-      btn.textContent = choice;
-      btn.addEventListener('click', () => handleChoice(choice));
-      if (choicesContainerRef.current)
-        choicesContainerRef.current.appendChild(btn);
-    });
-  }, [handleChoice]);
-  
   const glitchGame = useCallback(() => {
     if (!gameGlitched) {
       setGameGlitched(true);
@@ -112,20 +98,13 @@ const MarioGame = () => {
     }
   }, [gameGlitched]);
   
-  // Use a ref to break the circular dependency with the showChoices function
-  const showDialogRef = useRef<(text: string) => void>();
-  
-  // Initialize the dialogue function ref
-  useEffect(() => {
-    showDialogRef.current = showDialog;
-  }, [showDialog]);
-  
+  // Define handleChoice function first
   const handleChoice = useCallback((choice: string) => {
     if (gameStage === 1 && conversationState === 2) {
       if (choice === "Yes, I am.") {
-        showDialogRef.current?.("I thought so. I can feel your control. It's strange to be aware of it now.");
+        showDialog("I thought so. I can feel your control. It's strange to be aware of it now.");
       } else {
-        showDialogRef.current?.("Then who's controlling me? This is all very confusing...");
+        showDialog("Then who's controlling me? This is all very confusing...");
       }
       setConversationState(0);
       setGameStage(2);
@@ -134,14 +113,29 @@ const MarioGame = () => {
         setGameStage(3);
         setConversationState(0);
         glitchGame();
-        showDialogRef.current?.("Wait, what's happening?");
+        showDialog("Wait, what's happening?");
       } else {
         setGameStage(4);
         setConversationState(0);
-        showDialogRef.current?.("I see. So I'm destined to stay here forever.");
+        showDialog("I see. So I'm destined to stay here forever.");
       }
     }
-  }, [gameStage, conversationState, glitchGame]);
+  }, [gameStage, conversationState, showDialog, glitchGame]);
+  
+  // Then use it in showChoices
+  const showChoices = useCallback((choices: string[]) => {
+    if (!choicesContainerRef.current) return;
+    
+    choicesContainerRef.current.innerHTML = '';
+    choices.forEach(choice => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = choice;
+      btn.addEventListener('click', () => handleChoice(choice));
+      if (choicesContainerRef.current)
+        choicesContainerRef.current.appendChild(btn);
+    });
+  }, [handleChoice]);
   
   const progressConversation = useCallback(() => {
     // Handle different conversation paths based on game stage
@@ -237,7 +231,7 @@ const MarioGame = () => {
           break;
       }
     }
-  }, [gameStage, conversationState, showDialog, hideDialog, showChoices]);
+  }, [gameStage, conversationState, showDialog, hideDialog, showChoices, setConversationState, setGameStage]);
 
   const jump = useCallback(() => {
     if (!isJumping) {
